@@ -220,23 +220,26 @@ Author: Aaron Nech
       //window.localStorage.clear();
 
       is_admin = window.location.search.indexOf("admin");
+      console.log(is_admin);
 
       if (is_admin >= 0) {
+        window.localStorage.setItem("status", "active");
       } else {
         setInterval(function testMe() {
           status = window.localStorage.getItem("status");
+          console.log(window.localStorage.getItem("status"));
           if (status == "active") {
             console.log("status is active");
           }
         }, 1000);
       }
 
-      function testMe11() {
+      /* function testMe11() {
         console.log("status is active");
         if (status == "active") {
           console.log("status is active");
         }
-      }
+      } */
     </script>
   </body>
 </html>
