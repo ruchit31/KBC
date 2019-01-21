@@ -120,11 +120,19 @@ audio {
 }
 
 #answer-box {
+  display: flex;
+  flex-wrap: wrap;
   color: white;
   font-size: 1.1em;
   text-align: left;
   width: 960px;
   margin: 0 auto;
+}
+
+.answer {
+  width: 47.5%;
+  border: 5px solid white;
+  margin: 5px;
 }
 
 #pre-start {
