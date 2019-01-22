@@ -7,19 +7,19 @@
 * @param breakdDelim the string to deliminate the non-decimal
 *        parts of the number with. Default ","
 * @return returns this number as a USD-money-formatted String
-*		  like this: x,xxx.xx
+*         like this: x,xxx.xx
 */
 Number.prototype.money = function(fixed, decimalDelim, breakDelim){
-	var n = this,
-	fixed = isNaN(fixed = Math.abs(fixed)) ? 2 : fixed,
-	decimalDelim = decimalDelim == undefined ? "." : decimalDelim,
-	breakDelim = breakDelim == undefined ? "," : breakDelim,
-	negative = n < 0 ? "-" : "",
-	i = parseInt(n = Math.abs(+n || 0).toFixed(fixed)) + "",
-	j = (j = i.length) > 3 ? j % 3 : 0;
-	return negative + (j ? i.substr(0, j) +
-		 breakDelim : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + breakDelim) +
-		  (fixed ? decimalDelim + Math.abs(n - i).toFixed(fixed).slice(2) : "");
+    var n = this,
+    fixed = isNaN(fixed = Math.abs(fixed)) ? 2 : fixed,
+    decimalDelim = decimalDelim == undefined ? "." : decimalDelim,
+    breakDelim = breakDelim == undefined ? "," : breakDelim,
+    negative = n < 0 ? "-" : "",
+    i = parseInt(n = Math.abs(+n || 0).toFixed(fixed)) + "",
+    j = (j = i.length) > 3 ? j % 3 : 0;
+    return negative + (j ? i.substr(0, j) +
+         breakDelim : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + breakDelim) +
+          (fixed ? decimalDelim + Math.abs(n - i).toFixed(fixed).slice(2) : "");
 }
 
 /**
@@ -29,11 +29,12 @@ Number.prototype.money = function(fixed, decimalDelim, breakDelim){
 * @param id the id of the element to play
 * @param loop the boolean flag to loop or not loop this sound
 */
+var soundHandle;
 startSound = function(id, loop) {
-	soundHandle = document.getElementById(id);
-	if(loop)
-		soundHandle.setAttribute('loop', loop);
-	// soundHandle.play();
+    soundHandle = document.getElementById(id);
+    if(loop)
+        soundHandle.setAttribute('loop', loop);
+        soundHandle.play();
 }
 
 /**
@@ -43,9 +44,9 @@ startSound = function(id, loop) {
 * @param data the question bank to use
 */
 var MillionaireModel = function(data) {
-	var self = this;
+    var self = this;
 
-	// The 15 questions of this game
+    // The 15 questions of this game
     this.questions = data.questions;
 
     // A flag to keep multiple selections
@@ -53,171 +54,243 @@ var MillionaireModel = function(data) {
     this.transitioning = false;
 
     // The current money obtained
- 	this.money = new ko.observable(0);
+    this.money = new ko.observable(0);
 
- 	// The current level(starting at 1)
- 	this.level = new ko.observable(1);
+    // The current level(starting at 1)
+    this.level = new ko.observable(1);
 
- 	// The three options the user can use to
- 	// attempt to answer a question (1 use each)
- 	this.usedFifty = new ko.observable(false);
- 	this.usedPhone = new ko.observable(false);
- 	this.usedAudience = new ko.observable(false);
+    // The three options the user can use to
+    // attempt to answer a question (1 use each)
+    this.usedFifty = new ko.observable(false);
+    this.usedPhone = new ko.observable(false);
+     this.usedAudience = new ko.observable(false);
+     
+    // Start the program by pressing enter
+    var isCtrl = false;
+document.onkeyup=function(e) {
+    if(e.which == 13) isCtrl=false;
+}
+document.onkeydown=function(e){
+    if(e.which == 13) isCtrl=true;
+    if(e.which == 13 && isCtrl == true) {
+		if(self.questions[self.level() - 1].hasOwnProperty('audiosound')){
+			startSound(self.questions[self.level() - 1].audiosound, true);
+			}
+			else{
+				startSound('background', true);
+			}
 
- 	// Grabs the question text of the current question
- 	self.getQuestionText = function() {
+			$("#answer-box").show();
+         document.getElementById("answer-box").style.visibility='visible';
+         
+         return false;
+    }
+}
+
+    // Grabs the question text of the current question
+    self.getQuestionText = function() {
 		clearInterval(self.variable);
-		if(self.questions[self.level() - 1].hasOwnProperty('timeout')){
+        if(self.questions[self.level() - 1].hasOwnProperty('timeout')){
     $('#timer').find('.value').text(self.questions[self.level() - 1].timeout);
-		}
-		if(self.questions[self.level() - 1].timeout != -1) {
-			$('#timer').find('.value').text(self.questions[self.level() - 1].timeout);
-			self.variable = setInterval(self.updateDisplay, 1000);
-		}
- 		return self.questions[self.level() - 1].question;
- 	}
+        }
+        if(self.questions[self.level() - 1].timeout != -1) {
+            $('#timer').find('.value').text(self.questions[self.level() - 1].timeout);
+            self.variable = setInterval(self.updateDisplay, 1000);
+        }
+        return self.questions[self.level() - 1].question;
+    }
 
- 	// Gets the answer text of a specified question index (0-3)
- 	// from the current question
- 	self.getAnswerText = function(index) {
- 		return self.questions[self.level() - 1].content[index];
- 	}
+    // Gets the answer text of a specified question index (0-3)
+    // from the current question
+    self.getAnswerText = function(index) {
+        return self.questions[self.level() - 1].content[index];
+    }
 
- 	// Uses the fifty-fifty option of the user
- 	self.fifty = function(item, event) {
- 		if(self.transitioning)
- 			return;
- 		$(event.target).fadeOut('slow');
- 		var correct = this.questions[self.level() - 1].correct;
- 		var first = (correct + 1) % 4;
- 		var second = (first + 1) % 4;
- 		if(first == 0 || second == 0) {
- 			$("#answer-one").fadeOut('slow');
- 		}
- 		if(first == 1 || second == 1) {
- 			$("#answer-two").fadeOut('slow');
- 		}
- 		if(first == 2 || second == 2) {
- 			$("#answer-three").fadeOut('slow');
- 		}
- 		if(first == 3 || second == 3) {
- 			$("#answer-four").fadeOut('slow');
- 		}
- 	}
+    // Uses the fifty-fifty option of the user
+    self.fifty = function(item, event) {
+        if(self.transitioning)
+            return;
+        $(event.target).fadeOut('slow');
+        var correct = this.questions[self.level() - 1].correct;
+        var first = (correct + 1) % 4;
+        var second = (first + 1) % 4;
+        if(first == 0 || second == 0) {
+            $("#answer-one").fadeOut('slow');
+        }
+        if(first == 1 || second == 1) {
+            $("#answer-two").fadeOut('slow');
+        }
+        if(first == 2 || second == 2) {
+            $("#answer-three").fadeOut('slow');
+        }
+        if(first == 3 || second == 3) {
+            $("#answer-four").fadeOut('slow');
+        }
+    }
 
 self.nextBut = function(item, event) {
-		self.level(self.level() + 1);
+        self.level(self.level() + 1);
 		$("#" + self.currEle).css('background', 'none');
-		$("#answer-one").show();
-		$("#answer-two").show();
-		$("#answer-three").show();
-		$("#answer-four").show();
-		self.transitioning = false;
-		$("#nxt-btn").hide();
+		//document.getElementById("answer-box").style.visibility='hide';
+        $("#answer-box").hide();
+        //$("#answer-two").show();
+        //$("#answer-three").show();
+        //$("#answer-four").show();
+        self.transitioning = false;
+        $("#nxt-btn").hide();
 }
- 	// Fades out an option used if possible
- 	self.fadeOutOption = function(item, event) {
- 		if(self.transitioning)
- 			return;
- 		$(event.target).fadeOut('slow');
- 	}
 
- 	// Attempts to answer the question with the specified
- 	// answer index (0-3) from a click event of elm
- 	self.answerQuestion = function(index, elm) {
- 		if(self.transitioning)
- 			return;
- 		self.transitioning = true;
- 		if(self.questions[self.level() - 1].correct == index) {
- 			self.rightAnswer(elm);
- 		} else {
- 			self.wrongAnswer(elm);
- 		}
- 	}
+var abc;
+var globalIndex=-1;
+self.seeAns = function(item,event) {
+	
+        if(self.questions[self.level() - 1].correct == globalIndex) {
+            self.rightAnswer(abc);
+        } else {
+             self.wrongAnswer(abc);
+             var g = document.createElement('div');
+             if(self.questions[self.level() - 1].correct == 0)
+             g.id = 'answer-one';
+             else if(self.questions[self.level() - 1].correct ==1)
+             g.id = 'answer-two';
+             else if(self.questions[self.level() - 1].correct ==2)
+             g.id = 'answer-three';
+             else if(self.questions[self.level() - 1].correct ==3)
+             g.id = 'answer-three';
 
-	self.updateDisplay = function() {
-		//console.log("Starting the interval ");
-		var value = parseInt($('#timer').find('.value').text(), 10);
+             $("#" + g.id).slideUp('slow', function() {
+                $("#" + g.id).css('background', 'green').slideDown('slow', function() {
+                     
+                });
+            });
+             
+             
+         }
+
+         $("#see-ans").hide();
+
+}
+
+    // Fades out an option used if possible
+    self.fadeOutOption = function(item, event) {
+        if(self.transitioning)
+            return;
+        $(event.target).fadeOut('slow');
+    }
+
+    // Attempts to answer the question with the specified
+     // answer index (0-3) from a click event of elm
+     
+    self.answerQuestion = function(index, elm) {
+        if(self.transitioning)
+            return;
+        self.transitioning = true;
+    
+         abc=elm;
+         globalIndex=index;
+         self.selectAnswer(elm);
+
+     }
+     
+     self.selectAnswer = function(elm) {
+		soundHandle.pause();
+		soundHandle.currentTime = 0;
+        clearInterval(self.variable);
+        self.currEle = elm;
+        $("#" + elm).slideUp('slow', function() {
+            startSound('rightsound', false);
+            $("#" + elm).css('background', 'orange').slideDown('slow', function() {
+                
+                   $("#see-ans").show();
+            
+            });
+        });
+     }
+
+    self.updateDisplay = function() {
+        //console.log("Starting the interval ");
+        var value = parseInt($('#timer').find('.value').text(), 10);
     value--;
-		if (value <= 0) {
-			startSound('wrongsound', false);
-			$("#game").fadeOut('slow', function() {
-				$("#game-over").html('Game Over!');
-				$("#game-over-money").html('$ '+ self.money().money(2, '.', ','))
-				$("#game-over").fadeIn('slow');
-				$("#game-over-money").fadeIn('slow');
-				self.transitioning = false;
-				return;
-		});
-	}
+        if (value <= 0) {
+            startSound('wrongsound', false);
+            $("#game").fadeOut('slow', function() {
+                $("#game-over").html('Game Over!');
+                $("#game-over-money").html('$ '+ self.money().money(2, '.', ','))
+                $("#game-over").fadeIn('slow');
+                $("#game-over-money").fadeIn('slow');
+                self.transitioning = false;
+                return;
+        });
+    }
      $('#timer').find('.value').text(value);
-	}
- 	// Executes the proceedure of a correct answer guess, moving
- 	// the player to the next level (or winning the game if all
- 	// levels have been completed)
- 	self.rightAnswer = function(elm) {
-		clearInterval(self.variable);
-		self.currEle = elm;
- 		$("#" + elm).slideUp('slow', function() {
- 			startSound('rightsound', false);
- 			$("#" + elm).css('background', 'green').slideDown('slow', function() {
- 				self.money($(".active").data('amt'));
- 				if(self.level() + 1 > 15) {
-	 				$("#game").fadeOut('slow', function() {
-	 					$("#game-over").html('You Win!');
-	 					$("#game-over").fadeIn('slow');
-	 				});
- 				} else {
-					$("#nxt-btn").show();
- 				}
- 			});
- 		});
- 	}
+    }
+    // Executes the proceedure of a correct answer guess, moving
+    // the player to the next level (or winning the game if all
+    // levels have been completed)
+    self.rightAnswer = function(elm) {
+        clearInterval(self.variable);
+        self.currEle = elm;
+        $("#" + elm).slideUp('slow', function() {
+            startSound('rightsound', false);
+            $("#" + elm).css('background', 'green').slideDown('slow', function() {
+                self.money($(".active").data('amt'));
+                if(self.level() + 1 > 15) {
+                    $("#game").fadeOut('slow', function() {
+                        $("#game-over").html('You Win!');
+                        $("#game-over").fadeIn('slow');
+                    });
+                } else {
+                    $("#nxt-btn").show();
+                }
+            });
+        });
+    }
 
-	self.nextButton = function(elm) {
+    self.nextButton = function(elm) {
 
-	}
- 	// Executes the proceedure of guessing incorrectly, losing the game.
- 	self.wrongAnswer = function(elm) {
- 		$("#" + elm).slideUp('slow', function() {
- 			startSound('wrongsound', false);
- 			$("#" + elm).css('background', 'red').slideDown('slow', function() {
-				setTimeout(function() {
-					$("#game").fadeOut('slow', function() {
-	 					$("#game-over").html('Game Over!');
-						$("#game-over-money").html('$ '+ self.money().money(2, '.', ','))
-	 					$("#game-over").fadeIn('slow');
-						$("#game-over-money").fadeIn('slow');
-	 					self.transitioning = false;
-	 				});
-				}, 3000);
+    }
+    // Executes the proceedure of guessing incorrectly, losing the game.
+    self.wrongAnswer = function(elm) {
+        $("#" + elm).slideUp('slow', function() {
+            startSound('wrongsound', false);
+            $("#" + elm).css('background', 'red').slideDown('slow', function() {
+                setTimeout(function() {
+                    $("#game").fadeOut('slow', function() {
+                        $("#game-over").html('Game Over!');
+                        $("#game-over-money").html('$ '+ self.money().money(2, '.', ','))
+                        $("#game-over").fadeIn('slow');
+                        $("#game-over-money").fadeIn('slow');
+                        self.transitioning = false;
+                    });
+                }, 3000);
 
- 			});
- 		});
- 	}
+            });
+         });
 
- 	// Gets the money formatted string of the current won amount of money.
- 	self.formatMoney = function() {
-	    return self.money().money(2, '.', ',');
-	}
+    }
+
+    // Gets the money formatted string of the current won amount of money.
+    self.formatMoney = function() {
+        return self.money().money(2, '.', ',');
+    }
 };
 
 // Executes on page load, bootstrapping
 // the start game functionality to trigger a game model
 // being created
 $(document).ready(function() {
-	$.getJSON("questions.json", function(data) {
-		for(var i = 1; i <= data.games.length; i++) {
-			$("#problem-set").append('<option value="' + i + '">' + i + '</option>');
-		}
-		$("#pre-start").show();
-		$("#start").click(function() {
-			var index = $('#problem-set').find(":selected").val() - 1;
-			ko.applyBindings(new MillionaireModel(data.games[index]));
-			$("#pre-start").fadeOut('slow', function() {
-				startSound('background', true);
-				$("#game").fadeIn('slow');
-			});
-		});
-	});
+    $.getJSON("questions.json", function(data) {
+        for(var i = 1; i <= data.games.length; i++) {
+            $("#problem-set").append('<option value="' + i + '">' + i + '</option>');
+        }
+        $("#pre-start").show();
+        $("#start").click(function() {
+            var index = $('#problem-set').find(":selected").val() - 1;
+            ko.applyBindings(new MillionaireModel(data.games[index]));
+            $("#pre-start").fadeOut('slow', function() {
+               // startSound('background', true);
+                $("#game").fadeIn('slow');
+            });
+        });
+    });
 });

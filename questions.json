@@ -11,7 +11,8 @@
 		                "Hopscotch"
 		            ],
                     "timeout" : 50,
-		            "correct" : 0
+					"correct" : 0,
+					"audiosound":"sound1"
 
 		        },
 		        {
@@ -23,7 +24,8 @@
 		                "Treble"
 		            ],
                     "timeout" : 40,
-		            "correct" : 0
+					"correct" : 0,
+					"audiosound":"sound2"
 		        },
 		        {
 		            "question" : "Which material is most dense?",
@@ -34,7 +36,8 @@
 		                "Gold"
 		            ],
                     "timeout" : 30,
-		            "correct" : 3
+					"correct" : 3
+					
 		        },
 		        {
 		            "question" : "Which state in the United States is largest by area?",
@@ -45,7 +48,8 @@
 		                "Hawaii"
 		            ],
                     "timeout" :20,
-		            "correct" : 0
+					"correct" : 0,
+					"audiosound":"sound4"
 		        },
 		        {
 		            "question" : "What is Aurora Borealis commonly known as?",

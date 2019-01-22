@@ -21,6 +21,10 @@ Author: Aaron Nech
     <audio id="background" src="sound/background.mp3"></audio>
     <audio id="rightsound" src="sound/right.mp3"></audio>
     <audio id="wrongsound" src="sound/wrong.mp3"></audio>
+    <audio id="sound1" src="sound/sound1.mp3"></audio>
+    <audio id="sound2" src="sound/sound2.mp3"></audio>
+    <audio id="sound3" src="sound/sound3.mp3"></audio>
+    <audio id="sound4" src="sound/sound4.mp3"></audio>
 
     <!-- Before the game begins problem set selection -->
     <div id="pre-start">
@@ -166,7 +170,7 @@ Author: Aaron Nech
         <span class="big-text">Q:</span>
         <span class="content" data-bind="text: getQuestionText()"></span>
       </div>
-      <div id="answer-box">
+      <div id="answer-box" style="visibility:hidden">
         <div
           id="answer-one"
           class="answer"
@@ -208,6 +212,14 @@ Author: Aaron Nech
             hidden
           ></button>
         </div>
+        <div>
+          <button
+            id="see-ans"
+            class="options-button2"
+            data-bind="click: seeAns"
+            hidden
+          ></button>
+        </div>
       </div>
     </div>
 
@@ -218,6 +230,7 @@ Author: Aaron Nech
     <script>
       //Clear local storage
       //window.localStorage.clear();
+
 
       is_admin = window.location.search.indexOf("admin");
       console.log(is_admin);

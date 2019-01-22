@@ -111,6 +111,13 @@ audio {
   float: right;
 }
 
+#see-ans {
+  background: url("../img/ic_arrow_forward.png") no-repeat 0 0;
+  height: 64px;
+  width: 64px;
+  float: left;
+}
+
 #phone-friend {
   background: url("../img/phone-friend.png") no-repeat 0 0;
 }
@@ -166,6 +173,16 @@ audio {
   height: 64px;
   margin-left: 12px;
   float: left;
+  background-position: 0 0;
+  cursor: pointer;
+}
+
+
+.options-button2 {
+  width: 64px;
+  height: 64px;
+  margin-left: 12px;
+  float: right;
   background-position: 0 0;
   cursor: pointer;
 }
